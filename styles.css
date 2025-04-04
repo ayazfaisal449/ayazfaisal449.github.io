@@ -1,0 +1,57 @@
+/* Global Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+header {
+  background: #2c3e50;
+  color: #fff;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+h1, h2, h3 {
+  margin: 0;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; margin: 1.5rem 0; }
+h3 { font-size: 1.5rem; }
+
+section {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Project Grid */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Contact Icons */
+.contact-info i {
+  margin-right: 10px;
+  color: #2c3e50;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #2c3e50;
+  color: #fff;
+}
