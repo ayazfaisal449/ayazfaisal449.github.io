@@ -6,6 +6,27 @@ import { motion } from "framer-motion";
 
 const projects = [
   {
+    title: "Playli",
+    role: "Full-Stack Development (Laravel API + React App)",
+    stack: "Laravel 12 API, PHP 8.2, Laravel Passport, MySQL, React (Vite + TypeScript), React Query",
+    description:
+      "Built Playli as a sports community platform with event management, team workflows, chat/conversations, user ratings, reports, and role-based admin controls. Implemented REST APIs in Laravel and integrated them with a React user application.",
+    image: "/assets/playli-home.png",
+    liveUrl: "https://playli-366b008138e0.herokuapp.com/",
+    secondaryUrl: "https://playli-user-c572970ee529.herokuapp.com/login",
+    tags: ["Laravel", "Core PHP"]
+  },
+  {
+    title: "Brasil Planet Turismo",
+    role: "Laravel Development",
+    stack: "Laravel 12, PHP 8.2, Blade, MySQL, jQuery, Tailwind, Vite, Pusher",
+    description:
+      "Developed a tour and booking management platform with multi-step booking workflows, hotel and service management, supplier coordination, payment tracking, internal chat, notifications, and multilingual support.",
+    image: "/assets/brasil-planet-dashboard.png",
+    liveUrl: "https://horizon.brasilplanet.com.br/",
+    tags: ["Laravel", "Core PHP"]
+  },
+  {
     title: "QuickCash",
     role: "Laravel Development",
     stack: "Laravel 12, PHP 8.2+, MySQL, Stripe",
@@ -258,9 +279,20 @@ export default function HomePage() {
                   <strong>Stack:</strong> {project.stack}
                 </p>
                 <p>{project.description}</p>
-                <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-link">
-                  Live Project <ArrowUpRight size={15} />
-                </a>
+                {project.liveUrl ? (
+                  <div className="project-links">
+                    <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-link">
+                      User App <ArrowUpRight size={15} />
+                    </a>
+                    {project.secondaryUrl ? (
+                      <a href={project.secondaryUrl} target="_blank" rel="noreferrer" className="text-link">
+                        Global/Login <ArrowUpRight size={15} />
+                      </a>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className="text-link text-link--muted">Private Project (Demo not public)</p>
+                )}
               </div>
             </motion.article>
           ))}
