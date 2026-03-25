@@ -37,3 +37,4 @@ npm run start
 - Main page content: `app/page.js`
 - Global styling: `app/globals.css`
 - Static assets (images/pdf): `public/assets`
+## Thanks 
