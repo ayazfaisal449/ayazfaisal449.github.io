@@ -1,8 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowUpRight, Download, Github, Linkedin, Mail, Sparkles } from "lucide-react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { Download, Github, Linkedin, Mail, Sparkles } from "lucide-react";
+import AnimatedBackground from "./components/AnimatedBackground";
+import BackToTop from "./components/BackToTop";
+import CounterStat from "./components/CounterStat";
+import Navbar from "./components/Navbar";
+import PageLoader from "./components/PageLoader";
+import MotionSection, { MotionItem } from "./components/MotionSection";
+import RotatingRole from "./components/RotatingRole";
+import ScrollProgress from "./components/ScrollProgress";
+import SkillsTabs, { skillCategories } from "./components/SkillsTabs";
+import ProjectsCube from "./components/ProjectsCube";
+import { ease, fadeUp, stagger } from "./lib/motion";
 
 const projects = [
   {
@@ -13,8 +24,7 @@ const projects = [
       "Built Playli as a sports community platform with event management, team workflows, chat/conversations, user ratings, reports, and role-based admin controls. Implemented REST APIs in Laravel and integrated them with a React user application.",
     image: "/assets/playli-home.png",
     liveUrl: "https://playli-366b008138e0.herokuapp.com/",
-    secondaryUrl: "https://playli-user-c572970ee529.herokuapp.com/login",
-    tags: ["Laravel", "Core PHP"]
+    secondaryUrl: "https://playli-user-c572970ee529.herokuapp.com/login"
   },
   {
     title: "Brasil Planet Turismo",
@@ -23,8 +33,7 @@ const projects = [
     description:
       "Developed a tour and booking management platform with multi-step booking workflows, hotel and service management, supplier coordination, payment tracking, internal chat, notifications, and multilingual support.",
     image: "/assets/brasil-planet-dashboard.png",
-    liveUrl: "https://horizon.brasilplanet.com.br/",
-    tags: ["Laravel", "Core PHP"]
+    liveUrl: "https://horizon.brasilplanet.com.br/"
   },
   {
     title: "QuickCash",
@@ -33,8 +42,7 @@ const projects = [
     description:
       "Secure financial services platform with payment processing, money transfers, and verification workflows.",
     image: "/assets/quickcash.png",
-    liveUrl: "https://quickcash.crosip.com/",
-    tags: ["Laravel", "Fintech"]
+    liveUrl: "https://quickcash.crosip.com/"
   },
   {
     title: "JamPayroll",
@@ -43,8 +51,7 @@ const projects = [
     description:
       "Complete payroll and HR system with attendance, shift management, and employee lifecycle operations.",
     image: "/assets/jampayroll.png",
-    liveUrl: "https://jampayroll.crosip.com/",
-    tags: ["Laravel"]
+    liveUrl: "https://jampayroll.crosip.com/"
   },
   {
     title: "EstateShield",
@@ -53,8 +60,7 @@ const projects = [
     description:
       "Estate planning platform with document workflows, trust creation flows, and secure integrations.",
     image: "/assets/estate-shield.png",
-    liveUrl: "https://myestateshieldvi.com/",
-    tags: ["Laravel"]
+    liveUrl: "https://myestateshieldvi.com/"
   },
   {
     title: "Berflow",
@@ -63,8 +69,7 @@ const projects = [
     description:
       "HMS (Hospital Management System) with appointment booking, patient records, and billing automation.",
     image: "/assets/berflow.png",
-    liveUrl: "https://berflow.crosip.com/",
-    tags: ["Laravel", "Healthcare"]
+    liveUrl: "https://berflow.crosip.com/"
   },
   {
     title: "Holiday 360",
@@ -73,8 +78,7 @@ const projects = [
     description:
       "Multi-vendor tourism portal with packages, bookings, payment integration, and vendor management.",
     image: "/assets/Holiday360.png",
-    liveUrl: "https://holiday360.ae/",
-    tags: ["Core PHP"]
+    liveUrl: "https://holiday360.ae/"
   },
   {
     title: "Al Aswad",
@@ -83,8 +87,7 @@ const projects = [
     description:
       "E-commerce platform for modest fashion with robust checkout and product/order management.",
     image: "/assets/Al-Aswad.png",
-    liveUrl: "https://alaswad.shop/",
-    tags: ["OpenCart"]
+    liveUrl: "https://alaswad.shop/"
   },
   {
     title: "REPs UAE",
@@ -93,8 +96,7 @@ const projects = [
     description:
       "Major platform upgrade and backend enhancement for a health and fitness business platform.",
     image: "/assets/Reps-UAE.png",
-    liveUrl: "https://repsuae.com/",
-    tags: ["Laravel"]
+    liveUrl: "https://repsuae.com/"
   },
   {
     title: "Noir Cinema",
@@ -103,8 +105,7 @@ const projects = [
     description:
       "Cinema booking backend with authentication, seat selection, ticket booking flows, and payment integration.",
     image: "/assets/Noir-Cinema (2).png",
-    liveUrl: "https://noircinema.sa/",
-    tags: ["Core PHP"]
+    liveUrl: "https://noircinema.sa/"
   },
   {
     title: "NeoHealth",
@@ -113,8 +114,7 @@ const projects = [
     description:
       "Healthcare platform for telemedicine, appointments, patient management, and home-care service workflows.",
     image: "/assets/NeoHealth.png",
-    liveUrl: "https://neohealth.ae/",
-    tags: ["Core PHP", "Healthcare"]
+    liveUrl: "https://neohealth.ae/"
   },
   {
     title: "Winter Valley",
@@ -123,8 +123,7 @@ const projects = [
     description:
       "Real estate platform backend with listing management, advanced search filters, and map-based discovery.",
     image: "/assets/WINTER-VALLEY.png",
-    liveUrl: "https://land.wintervalley.co/",
-    tags: ["Core PHP"]
+    liveUrl: "https://land.wintervalley.co/"
   },
   {
     title: "Method By Kat",
@@ -133,220 +132,282 @@ const projects = [
     description:
       "Subscription-plus-shop platform with secure checkout, account flows, and continued API maintenance work.",
     image: "/assets/Method-By-Kat.png",
-    liveUrl: "https://methodbykat.com/",
-    tags: ["OpenCart"]
+    liveUrl: "https://methodbykat.com/"
   }
 ];
 
-const container = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08
-    }
-  }
-};
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55 } }
-};
+const stats = [
+  { value: 4, suffix: "+", label: "Years Experience" },
+  { value: 13, suffix: "+", label: "Live Projects" },
+  { value: 10, suffix: "+", label: "Industries Served" }
+];
+
+const experience = [
+  {
+    title: "Full Stack PHP Laravel Developer",
+    company: "eSquall Technologies",
+    period: "May 2025 – Present",
+    location: "Islamabad, PK",
+    points: [
+      "Architected enterprise applications using Laravel 12 and PHP 8.2+ with clean architecture and SOLID principles, delivering 15+ production modules with zero critical bugs.",
+      "Optimized API and MySQL performance via Redis caching, Laravel Queues, indexing, and eager loading, cutting response times and query execution by 35%.",
+      "Achieved 80%+ PHPUnit test coverage; implemented GitHub Actions CI/CD with zero-downtime deployments, and mentored junior developers."
+    ]
+  },
+  {
+    title: "PHP Backend Developer",
+    company: "Sigma Digital Solution",
+    period: "Sep 2021 – May 2025",
+    location: "Islamabad, PK",
+    points: [
+      "Architected and delivered 10+ production REST APIs for web and mobile apps across fintech, healthcare, and real estate.",
+      "Integrated 9 payment gateways (Checkout.com, Stripe, Tap, MPGS, Tabby, PayPal, Apple Pay, Payfort, Affirm) and implemented JWT auth with Spatie RBAC.",
+      "Optimized Eloquent and raw MySQL queries, reducing API response times by up to 40%, while collaborating in Agile/Scrum sprints."
+    ]
+  }
+];
 
 export default function HomePage() {
   const [submitted, setSubmitted] = useState(false);
+  const heroRef = useRef(null);
 
   return (
-    <main className="site">
-      <div className="bg-orb bg-orb-1" />
-      <div className="bg-orb bg-orb-2" />
+    <>
+      <PageLoader />
+      <ScrollProgress />
+      <AnimatedBackground />
+      <Navbar />
+      <BackToTop />
 
-      <motion.header
-        className="hero section"
-        variants={container}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.p className="eyebrow" variants={fadeUp}>
-          <Sparkles size={16} /> Available for Remote Backend Roles
-        </motion.p>
-        <motion.h1 variants={fadeUp}>
-          Faisal Ayaz
-          <span>PHP & Laravel Developer</span>
-        </motion.h1>
-        <motion.p className="hero-copy" variants={fadeUp}>
-          I build reliable, scalable, and secure web platforms with strong backend architecture and
-          performance-focused development.
-        </motion.p>
-        <motion.div className="hero-actions" variants={fadeUp}>
-          <a href="#projects" className="btn btn-primary">
-            View Projects
-          </a>
-          <a href="/assets/Faisal Ayaz - (PHP developer).pdf" className="btn btn-ghost" target="_blank" rel="noreferrer">
-            Resume <Download size={16} />
-          </a>
-        </motion.div>
-      </motion.header>
+      <main className="site">
+        <header className="hero-wrap" ref={heroRef}>
+          <motion.div
+            className="hero"
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.p className="eyebrow" variants={fadeUp}>
+              <Sparkles size={15} /> Available for Remote Backend Roles
+            </motion.p>
 
-      <section id="about" className="section card">
-        <h2>About Me</h2>
-        <div className="about-grid">
-          <div className="about-image-wrap">
-            <img src="/assets/profile.jpg" alt="Faisal Ayaz profile" className="about-image" />
-          </div>
-          <div>
-            <p>
-              I&apos;m Faisal Ayaz, a passionate and performance-driven PHP web developer with over 4 years
-              of experience building scalable, secure, and user-friendly web applications. My core expertise
-              includes Laravel, OpenCart, CodeIgniter, Core PHP, MySQL, REST APIs, and JavaScript.
-            </p>
-            <p>
-              I&apos;ve delivered projects across fintech, healthcare, real estate, tourism, fitness, and
-              e-commerce - including cinema booking systems, hospital management systems (HMS), multi-vendor
-              tourism portals, and custom healthcare platforms.
-            </p>
-            <p>
-              I focus on clean architecture, secure integrations, and smooth user experience. I continuously
-              improve my backend practices to ship reliable products that scale and are easy to maintain.
-            </p>
-          </div>
-        </div>
-      </section>
+            <motion.div className="hero-heading" variants={fadeUp}>
+              <h1 className="hero-title">Faisal Ayaz</h1>
+              <p className="hero-role">
+                <RotatingRole />
+              </p>
+            </motion.div>
 
-      <section className="section card">
-        <h2>Core Skills</h2>
-        <div className="skills-grid">
-          {[
-            ["Laravel & PHP", 95],
-            ["MySQL & Query Optimization", 90],
-            ["REST APIs & Integrations", 92],
-            ["Payment Gateways", 88],
-            ["CodeIgniter / OpenCart", 86],
-            ["System Architecture", 87]
-          ].map(([label, percent]) => (
-            <div key={label} className="skill-item">
-              <div className="skill-head">
-                <span>{label}</span>
-                <span>{percent}%</span>
-              </div>
-              <div className="skill-track">
-                <div className="skill-fill" style={{ width: `${percent}%` }} />
+            <motion.p className="hero-copy" variants={fadeUp}>
+              I build reliable, scalable, and secure web platforms with strong backend
+              architecture and performance-focused development.
+            </motion.p>
+
+            <motion.div className="hero-actions" variants={fadeUp}>
+              <motion.a
+                href="#projects"
+                className="btn btn-primary"
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                View Projects
+              </motion.a>
+              <motion.a
+                href="/assets/Faisal Ayaz - (PHP developer).pdf"
+                className="btn btn-ghost"
+                target="_blank"
+                rel="noreferrer"
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Resume <Download size={16} />
+              </motion.a>
+            </motion.div>
+
+            <motion.div className="hero-stats" variants={fadeUp}>
+              {stats.map((stat) => (
+                <CounterStat
+                  key={stat.label}
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  label={stat.label}
+                />
+              ))}
+            </motion.div>
+          </motion.div>
+        </header>
+
+        <MotionSection id="about" className="section card" bgVariant="about">
+          <MotionItem>
+            <p className="section-label">About</p>
+            <h2>About Me</h2>
+          </MotionItem>
+          <MotionItem>
+            <div className="about-grid">
+              <motion.div
+                className="about-image-wrap"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                whileHover={{ scale: 1.03, rotate: 1 }}
+                transition={{ duration: 0.5, ease }}
+              >
+                <img src="/assets/profile.jpg" alt="Faisal Ayaz profile" className="about-image" />
+              </motion.div>
+              <div>
+                <p>
+                  I&apos;m Faisal Ayaz, a passionate and performance-driven PHP web developer with over 4
+                  years of experience building scalable, secure, and user-friendly web applications. My
+                  core expertise includes Laravel, OpenCart, CodeIgniter, Core PHP, MySQL, REST APIs,
+                  AWS, AI integration, and production deployment on VPS, shared hosting, and cloud platforms.
+                </p>
+                <p>
+                  I&apos;ve delivered projects across fintech, healthcare, real estate, tourism, fitness,
+                  and e-commerce — including cinema booking systems, hospital management systems (HMS),
+                  multi-vendor tourism portals, and custom healthcare platforms.
+                </p>
+                <p>
+                  I focus on clean architecture, secure integrations, and smooth user experience. I also
+                  handle production deployment across AWS, Hostinger VPS, shared hosting, Netlify, and
+                  other environments — plus AI-powered features through API integrations.
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </MotionItem>
+        </MotionSection>
 
-      <section className="section card">
-        <h2>Experience Highlights</h2>
-        <div className="timeline">
-          <div className="timeline-item">
-            <h3>Senior PHP / Laravel Developer</h3>
-            <p>Built and scaled backend systems across fintech, healthcare, and enterprise SaaS.</p>
-          </div>
-          <div className="timeline-item">
-            <h3>Backend Integrations Specialist</h3>
-            <p>Integrated Stripe, PayPal, Twilio, SendGrid, DocuSign, and map/payment APIs.</p>
-          </div>
-          <div className="timeline-item">
-            <h3>Legacy to Modern Upgrade Work</h3>
-            <p>Migrated and upgraded older platforms to modern Laravel versions and secure workflows.</p>
-          </div>
-        </div>
-      </section>
+        <MotionSection id="skills" className="section card" bgVariant="skills">
+          <MotionItem>
+            <p className="section-label">Expertise</p>
+            <h2>Core Skills</h2>
+          </MotionItem>
+          <MotionItem>
+            <SkillsTabs categories={skillCategories} />
+          </MotionItem>
+        </MotionSection>
 
-      <motion.section
-        id="projects"
-        className="section"
-        variants={container}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
-      >
-        <h2 className="section-title">Projects</h2>
-        <div className="projects-grid">
-          {projects.map((project) => (
-            <motion.article key={project.title} className="project-card" variants={fadeUp}>
-              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="project-image-wrap">
-                <img src={project.image} alt={project.title} className="project-image" />
-              </a>
-              <div className="project-content">
-                <h3>{project.title}</h3>
-                <p className="meta">
-                  <strong>Role:</strong> {project.role}
-                </p>
-                <p className="meta">
-                  <strong>Stack:</strong> {project.stack}
-                </p>
-                <p>{project.description}</p>
-                {project.liveUrl ? (
-                  <div className="project-links">
-                    <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-link">
-                      User App <ArrowUpRight size={15} />
-                    </a>
-                    {project.secondaryUrl ? (
-                      <a href={project.secondaryUrl} target="_blank" rel="noreferrer" className="text-link">
-                        Global/Login <ArrowUpRight size={15} />
-                      </a>
-                    ) : null}
+        <MotionSection id="experience" className="section card" bgVariant="experience">
+          <MotionItem>
+            <p className="section-label">Experience</p>
+            <h2>Professional Experience</h2>
+          </MotionItem>
+          <div className="timeline">
+            {experience.map((item) => (
+              <MotionItem key={`${item.company}-${item.period}`}>
+                <article className="timeline-item">
+                  <div className="timeline-head">
+                    <span className="timeline-period">{item.period}</span>
+                    <span className="timeline-context">{item.location}</span>
                   </div>
-                ) : (
-                  <p className="text-link text-link--muted">Private Project (Demo not public)</p>
-                )}
-              </div>
-            </motion.article>
-          ))}
-        </div>
-      </motion.section>
+                  <h3>{item.title}</h3>
+                  <p className="timeline-company">{item.company}</p>
+                  <ul className="timeline-points">
+                    {item.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </article>
+              </MotionItem>
+            ))}
+          </div>
+        </MotionSection>
 
-      <section id="contact" className="section card contact">
-        <h2>Let&apos;s Work Together</h2>
-        <p>Have a backend-heavy project or need Laravel expertise? I can help you ship faster.</p>
-        <form
-          className="contact-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const form = event.currentTarget;
-            const data = new FormData(form);
-            const name = data.get("name");
-            const email = data.get("email");
-            const message = data.get("message");
-            const subject = `Portfolio Inquiry from ${name}`;
-            const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0AMessage: ${message}`;
-            window.location.href = `mailto:ayazfaisal449@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
-            setSubmitted(true);
-            form.reset();
-          }}
-        >
-          <input name="name" type="text" placeholder="Your name" required />
-          <input name="email" type="email" placeholder="Your email" required />
-          <textarea name="message" placeholder="Tell me about your project..." rows={5} required />
-          <button type="submit" className="btn btn-primary">
-            Send Message <Mail size={16} />
-          </button>
-          {submitted ? <p className="success-text">Thanks! Your email app should open now.</p> : null}
-        </form>
-        <div className="social-links">
-          <a
-            href="https://github.com/ayazfaisal449"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub Profile"
-            className="social-link"
-          >
-            <Github size={18} /> GitHub
-          </a>
-          <a
-            href="https://www.linkedin.com/in/faisal-ayaz-239a16177"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="LinkedIn Profile"
-            className="social-link"
-          >
-            <Linkedin size={18} /> LinkedIn
-          </a>
-        </div>
-      </section>
-    </main>
+        <MotionSection id="projects" className="section" bgVariant="projects">
+          <MotionItem>
+            <p className="section-label">Portfolio</p>
+            <h2 className="section-title">Selected Projects</h2>
+          </MotionItem>
+          <MotionItem>
+            <ProjectsCube projects={projects} />
+          </MotionItem>
+        </MotionSection>
+
+        <MotionSection id="contact" className="section card contact" bgVariant="contact">
+          <MotionItem>
+            <p className="section-label">Contact</p>
+            <h2>Let&apos;s Work Together</h2>
+            <p className="contact-lead">
+              Have a backend-heavy project or need Laravel expertise? I can help you ship faster.
+            </p>
+          </MotionItem>
+          <MotionItem>
+            <form
+              className="contact-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const data = new FormData(form);
+                const name = data.get("name");
+                const email = data.get("email");
+                const message = data.get("message");
+                const subject = `Portfolio Inquiry from ${name}`;
+                const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0AMessage: ${message}`;
+                window.location.href = `mailto:ayazfaisal449@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+                setSubmitted(true);
+                form.reset();
+              }}
+            >
+              <input name="name" type="text" placeholder="Your name" required />
+              <input name="email" type="email" placeholder="Your email" required />
+              <textarea name="message" placeholder="Tell me about your project..." rows={5} required />
+              <motion.button
+                type="submit"
+                className="btn btn-primary"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Send Message <Mail size={16} />
+              </motion.button>
+              {submitted ? (
+                <motion.p
+                  className="success-text"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease }}
+                >
+                  Thanks! Your email app should open now.
+                </motion.p>
+              ) : null}
+            </form>
+          </MotionItem>
+          <MotionItem>
+            <div className="social-links">
+              <motion.a
+                href="https://github.com/ayazfaisal449"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="GitHub Profile"
+                className="social-link"
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Github size={18} /> GitHub
+              </motion.a>
+              <motion.a
+                href="https://www.linkedin.com/in/faisal-ayaz-239a16177"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn Profile"
+                className="social-link"
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Linkedin size={18} /> LinkedIn
+              </motion.a>
+            </div>
+          </MotionItem>
+        </MotionSection>
+
+        <footer className="footer">
+          <p>© {new Date().getFullYear()} Faisal Ayaz. All rights reserved.</p>
+        </footer>
+      </main>
+    </>
   );
 }
