@@ -39,6 +39,12 @@ const variants = {
     orb2: "rgba(61, 214, 255, 0.1)",
     ring: "rgba(109, 124, 255, 0.16)",
     grid: 0.04
+  },
+  github: {
+    orb1: "rgba(34, 197, 94, 0.1)",
+    orb2: "rgba(109, 124, 255, 0.09)",
+    ring: "rgba(34, 197, 94, 0.16)",
+    grid: 0.035
   }
 };
 

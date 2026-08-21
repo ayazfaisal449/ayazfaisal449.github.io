@@ -14,6 +14,8 @@ import RotatingRole from "./components/RotatingRole";
 import ScrollProgress from "./components/ScrollProgress";
 import SkillsTabs, { skillCategories } from "./components/SkillsTabs";
 import ProjectsCube from "./components/ProjectsCube";
+import GitHubAchievements from "./components/GitHubAchievements";
+import GitHubContributions from "./components/GitHubContributions";
 import { ease, fadeUp, stagger } from "./lib/motion";
 import { WHATSAPP_DISPLAY, WHATSAPP_SHARE_URL } from "./lib/whatsapp";
 
@@ -318,6 +320,22 @@ export default function HomePage() {
           </div>
         </MotionSection>
 
+        <MotionSection id="github" className="section card github-section" bgVariant="github">
+          <MotionItem>
+            <p className="section-label">Open Source Activity</p>
+            <h2>GitHub Contributions</h2>
+            <p className="github-section-lead">
+              A snapshot of my coding activity over the last year, including private repository work when enabled.
+            </p>
+          </MotionItem>
+          <MotionItem>
+            <GitHubContributions />
+          </MotionItem>
+          <MotionItem>
+            <GitHubAchievements />
+          </MotionItem>
+        </MotionSection>
+
         <MotionSection id="projects" className="section" bgVariant="projects">
           <MotionItem>
             <p className="section-label">Portfolio</p>
@@ -339,6 +357,7 @@ export default function HomePage() {
           <MotionItem>
             <form
               className="contact-form"
+              suppressHydrationWarning
               onSubmit={(event) => {
                 event.preventDefault();
                 const form = event.currentTarget;
@@ -353,12 +372,19 @@ export default function HomePage() {
                 form.reset();
               }}
             >
-              <input name="name" type="text" placeholder="Your name" required />
-              <input name="email" type="email" placeholder="Your email" required />
-              <textarea name="message" placeholder="Tell me about your project..." rows={5} required />
+              <input name="name" type="text" placeholder="Your name" required suppressHydrationWarning />
+              <input name="email" type="email" placeholder="Your email" required suppressHydrationWarning />
+              <textarea
+                name="message"
+                placeholder="Tell me about your project..."
+                rows={5}
+                required
+                suppressHydrationWarning
+              />
               <motion.button
                 type="submit"
                 className="btn btn-primary"
+                suppressHydrationWarning
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}

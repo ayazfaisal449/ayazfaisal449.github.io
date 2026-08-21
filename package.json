@@ -5,7 +5,9 @@
   "description": "Modern Next.js portfolio for Faisal Ayaz",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/fetch-github-contributions.mjs && node scripts/fetch-github-achievements.mjs && next build",
+    "fetch:github": "node scripts/fetch-github-contributions.mjs && node scripts/fetch-github-achievements.mjs",
+    "fetch:github-achievements": "node scripts/fetch-github-achievements.mjs",
     "start": "next start",
     "lint": "next lint"
   },

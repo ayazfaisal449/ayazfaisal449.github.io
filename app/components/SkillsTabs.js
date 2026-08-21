@@ -180,6 +180,7 @@ function SkillCard({ name, percent, index }) {
 
 export default function SkillsTabs({ categories }) {
   const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
   const [activeId, setActiveId] = useState(categories[0]?.id);
   const [activeSubId, setActiveSubId] = useState(categories[0]?.subcategories[0]?.id);
 
@@ -189,8 +190,67 @@ export default function SkillsTabs({ categories }) {
     activeCategory.subcategories[0];
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     setActiveSubId(activeCategory.subcategories[0]?.id);
   }, [activeCategory.id]);
+
+  if (!mounted) {
+    const placeholderCategory = categories[0];
+    const placeholderSubcategory = placeholderCategory?.subcategories[0];
+
+    return (
+      <div className="skills-tabs">
+        <div className="skills-tab-list" role="tablist" aria-label="Skill categories">
+          {categories.map((category, index) => {
+            const Icon = category.icon;
+            return (
+              <div
+                key={category.id}
+                className={`skills-tab ${index === 0 ? "is-active" : ""}`}
+                aria-hidden="true"
+              >
+                <Icon size={16} />
+                <span>{category.label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="skills-panel">
+          <div className="skills-panel-head">
+            <p>{placeholderCategory?.description}</p>
+            <span>{countSkills(placeholderCategory)} skills</span>
+          </div>
+
+          <div className="skills-subtab-list" aria-hidden="true">
+            {placeholderCategory?.subcategories.map((subcategory, index) => (
+              <div key={subcategory.id} className={`skills-subtab ${index === 0 ? "is-active" : ""}`}>
+                <span>{subcategory.label}</span>
+                <em>{subcategory.skills.length}</em>
+              </div>
+            ))}
+          </div>
+
+          <div className="skills-subpanel">
+            {placeholderSubcategory?.description ? (
+              <p className="skills-subpanel-desc">{placeholderSubcategory.description}</p>
+            ) : null}
+
+            <div
+              className={`skills-cards ${placeholderSubcategory?.skills.length > 4 ? "is-scrollable" : ""}`}
+            >
+              {placeholderSubcategory?.skills.map(([name, percent], index) => (
+                <SkillCard key={name} name={name} percent={percent} index={index} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="skills-tabs">

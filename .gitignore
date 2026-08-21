@@ -3,3 +3,5 @@ dist/
 .parcel-cache
 .next/
 out/
+.env
+.env.local
