@@ -1,4 +1,5 @@
-import { writeFile, mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { writeFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnv } from "./load-env.mjs";
@@ -15,19 +16,7 @@ const API_BASE =
   process.env.GITHUB_ACHIEVEMENTS_API ||
   "https://github-achievements-api.wangrunlin.workers.dev";
 
-async function fetchAchievements() {
-  const response = await fetch(`${API_BASE}/${USERNAME}`, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "faisal-ayaz-portfolio"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Achievements API failed (${response.status})`);
-  }
-
-  const payload = await response.json();
+function normalizePayload(payload) {
   if (!Array.isArray(payload?.achievements)) {
     throw new Error("Unexpected achievements API response");
   }
@@ -48,14 +37,73 @@ async function fetchAchievements() {
   };
 }
 
+async function fetchAchievements(allowRetry = true) {
+  const response = await fetch(`${API_BASE}/${USERNAME}`, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "faisal-ayaz-portfolio"
+    }
+  });
+
+  if (response.status === 429 && allowRetry) {
+    console.warn("Achievements API rate limited (429). Retrying in 3 seconds...");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    return fetchAchievements(false);
+  }
+
+  if (!response.ok) {
+    throw new Error(`Achievements API failed (${response.status})`);
+  }
+
+  return normalizePayload(await response.json());
+}
+
+async function loadCachedData() {
+  if (!existsSync(outFile)) return null;
+
+  try {
+    const parsed = JSON.parse(await readFile(outFile, "utf8"));
+    if (!Array.isArray(parsed?.achievements)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 async function main() {
-  const data = await fetchAchievements();
-  await mkdir(outDir, { recursive: true });
-  await writeFile(outFile, `${JSON.stringify(data, null, 2)}\n`, "utf8");
-  console.log(
-    `Fetched ${data.achievements.length} achievements for ${data.username}`
-  );
-  console.log(`Wrote ${path.relative(root, outFile)}`);
+  let data;
+  let wroteFile = false;
+
+  try {
+    data = await fetchAchievements();
+    console.log(`Fetched ${data.achievements.length} achievements for ${data.username}`);
+  } catch (error) {
+    console.warn(`Achievements API fetch failed: ${error.message}`);
+
+    const cached = await loadCachedData();
+    if (cached?.achievements.length) {
+      console.warn(`Using cached achievements from ${path.relative(root, outFile)}`);
+      data = cached;
+    } else {
+      console.warn("No cached achievements available; continuing with an empty list.");
+      data = {
+        username: USERNAME,
+        total: { raw: 0, weighted: 0 },
+        achievements: [],
+        source: "unavailable",
+        fetchedAt: new Date().toISOString()
+      };
+      await mkdir(outDir, { recursive: true });
+      await writeFile(outFile, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+      wroteFile = true;
+    }
+  }
+
+  if (!wroteFile && data.source === "github-achievements-api") {
+    await mkdir(outDir, { recursive: true });
+    await writeFile(outFile, `${JSON.stringify(data, null, 2)}\n`, "utf8");
+    console.log(`Wrote ${path.relative(root, outFile)}`);
+  }
 }
 
 main().catch((error) => {
