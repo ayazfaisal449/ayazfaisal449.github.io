@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    # Daily at 2:00 AM UTC — refreshes GitHub contributions & achievements
+    - cron: "0 2 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -31,7 +35,7 @@ jobs:
         run: npm run build
 
       - name: Deploy to GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
         uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: gh-pages
@@ -39,3 +43,15 @@ jobs:
           jekyll: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Netlify rebuild
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        env:
+          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -n "$NETLIFY_BUILD_HOOK" ]; then
+            curl -fsS -X POST -d {} "$NETLIFY_BUILD_HOOK"
+            echo "Netlify rebuild triggered."
+          else
+            echo "NETLIFY_BUILD_HOOK secret not set — skipping Netlify rebuild."
+          fi
