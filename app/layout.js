@@ -63,6 +63,9 @@ export const metadata = {
   icons: {
     icon: "/assets/favicon.png",
     apple: "/assets/favicon.png"
+  },
+  verification: {
+    google: "na97auRQFSTslOZA1CH8947cacrngS3CWfOzazyKsGs"
   }
 };
 
