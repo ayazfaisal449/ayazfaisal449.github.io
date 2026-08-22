@@ -1,0 +1,26 @@
+{
+  "username": "faisalayaz447",
+  "total": {
+    "raw": 3,
+    "weighted": 6
+  },
+  "achievements": [
+    {
+      "type": "pull-shark",
+      "tier": 4,
+      "image": "https://github.githubassets.com/assets/pull-shark-default-498c279a747d.png"
+    },
+    {
+      "type": "pair-extraordinaire",
+      "tier": 1,
+      "image": "https://github.githubassets.com/assets/pair-extraordinaire-default-579438a20e01.png"
+    },
+    {
+      "type": "yolo",
+      "tier": 1,
+      "image": "https://github.githubassets.com/assets/yolo-default-be0bbff04951.png"
+    }
+  ],
+  "source": "github-achievements-api",
+  "fetchedAt": "2026-08-22T02:52:41.409Z"
+}
